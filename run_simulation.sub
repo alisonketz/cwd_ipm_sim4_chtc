@@ -1,0 +1,41 @@
+# run_simulation.sub
+# Survival simulation submit file
+#
+# Specify the HTCondor Universe (vanilla is the default and is used
+#  for almost all jobs), the desired name of the HTCondor log file,
+#  and the desired name of the standard error file.  
+#  Wherever you see $(Cluster), HTCondor will insert the queue number
+#  assigned to this set of jobs at the time of submission.
+#
+universe = vanilla
+log = log/ipmsim_$(Cluster)_$(Process).log
+error = error/ipmsim_$(Cluster)_$(Process).err
+#
+# Specify your executable (single binary or a script that runs several
+#  commands), arguments, and a files for HTCondor to store standard
+#  output (or "screen output").
+#  $(Process) will be a integer number for each job, starting with "0"
+#  and increasing for the relevant number of jobs.
+#
+executable = run_simulation.sh
+arguments = $(Process)
+output = output/ipmsim_$(Cluster)_$(Process).out
+#
+# Specify that HTCondor should transfer files to and from the
+#  computer where each job runs. The last of these lines *would* be
+#  used if there were any other files needed for the executable to run.
+should_transfer_files = YES
+when_to_transfer_output = ON_EXIT
+transfer_input_files =  http://proxy.chtc.wisc.edu/SQUID/chtc/el8/R413.tar.gz, packages.tar.gz, 01_overall_cwd_ipm.R, 02_load_all_data_to_run.R, 03_fun_generate_data.R, 04_generate_data_noremove_icap.R, 05_prelim_survival.R, 06_prelim_foi.R, 07_distributions.R, 08_calculations.R, 09_modelcode.R, 10_run_model.R, 11_post_process.R, fit_sum_finaldat.Rdata
+
+#
+# Tell HTCondor what amount of compute resources
+#  each job will need on the computer where it runs.
+request_cpus = 1
+request_memory = 4GB
+request_disk = 512MB
+#+LongJob = true
+#requirements = opsysmajorver==7
+#
+# Tell HTCondor to run 100 instances of our job:
+queue 100
